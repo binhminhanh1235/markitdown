@@ -43,14 +43,14 @@ def convert_document(uploaded_file):
         
         return (
             md_content,          # Hiển thị Rendered Markdown
-            result.text_content, # Hiển thị Raw Markdown Text
+            result.text_content, # Hiển thị Raw Markdown Code
             output_path,         # Đường dẫn file tải về
             status_msg           # Thông báo trạng thái
         )
     except Exception as e:
         error_msg = f"❌ Lỗi trong quá trình chuyển đổi: {str(e)}"
         return (
-            f"**Đã xảy ra lỗi:**\n`\n{str(e)}\n`",
+            f"**Đã xảy ra lỗi:**\n```\n{str(e)}\n```",
             "",
             None,
             error_msg
@@ -66,7 +66,7 @@ custom_css = """
 .output-box { min-height: 400px; }
 """
 
-with gr.Blocks(title="MarkItDown Web UI", css=custom_css, theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="MarkItDown Web UI") as demo:
     gr.Markdown(
         """
         # 📝 MarkItDown Web Converter
@@ -121,11 +121,10 @@ with gr.Blocks(title="MarkItDown Web UI", css=custom_css, theme=gr.themes.Soft()
                         elem_classes=["output-box"]
                     )
                 with gr.TabItem("💻 Mã nguồn Markdown (Raw Text)"):
-                    raw_preview = gr.Textbox(
+                    raw_preview = gr.Code(
                         label="Mã Markdown thô",
-                        placeholder="Nội dung Markdown sẽ xuất hiện tại đây...",
+                        language="markdown",
                         lines=18,
-                        show_copy_button=True,
                         interactive=False
                     )
 
@@ -150,9 +149,8 @@ with gr.Blocks(title="MarkItDown Web UI", css=custom_css, theme=gr.themes.Soft()
     )
 
 if __name__ == "__main__":
-    import sys
     # Cho phép public ra internet qua share=True (mặc định True để dùng được trên Colab / mạng ngoài)
     share_env = os.getenv("GRADIO_SHARE", "true").lower() in ("true", "1", "yes")
     port = int(os.getenv("PORT", 7860))
     print("Khởi chạy MarkItDown Web UI...")
-    demo.launch(share=share_env, server_port=port)
+    demo.launch(share=share_env, server_port=port, theme=gr.themes.Soft(), css=custom_css)
